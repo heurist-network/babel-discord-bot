@@ -4,6 +4,7 @@ from openai import OpenAI
 import asyncio
 from collections import deque
 import discord
+from discord.commands import Option
 import time
 import random
 # from BotInfo import ShellBot_manager
@@ -11,20 +12,51 @@ OPENROUTER_API_KEY = "sk-or-v1-a040cfe87f787b7c2f31099e870ed23268ecdc7ea25b4040d
 
 client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
 
+# language_channels = {
+#     'korean': 1224412891340607712,  # Replace with the actual channel ID for Korean
+#     'chinese': 1224412666450153482,  # Replace with the actual channel ID for Chinese
+#     'hindi': 1224412612025126965,
+#     'japanese': 1224412835392651334,
+#     'french': 1224412994549714975,
+#     'vietnamese': 1224414528863735940,
+#     'spanish': 1224505863784632340,
+
+# }
+
 language_channels = {
     'korean': 1226343034514440353,  # Replace with the actual channel ID for Korean
     'chinese': 1226343034514440353,  # Replace with the actual channel ID for Chinese
+    'hindi': 1226343034514440353,
+    'japanese': 1226343034514440353,
+    'french': 1226343034514440353,
+    'vietnamese': 1226343034514440353,
+    'spanish': 1226343034514440353,
+
 }
+
 
 monitored_channels = [
     1224412891340607712,  # Chinese channel
-    1224412666450153482, # Korean channel,
+    1224412666450153482, # Korean channel
+    1224412835392651334, # Japanese channel
+    1224412612025126965, # India channel
+    1224412994549714975, # French channel
+    1224414528863735940, # Vietnamese channel
+    1224505863784632340, # Spanish channel
     1226343034514440353,  # Mock chinese channel
 
     # Add more channel IDs as needed
 ]
 
-
+language_choices = [
+    discord.OptionChoice(name='Korean', value='korean'),
+    discord.OptionChoice(name='Chinese', value='chinese'),
+    discord.OptionChoice(name='Hindi', value='hindi'),
+    discord.OptionChoice(name='Japanese', value='japanese'),
+    discord.OptionChoice(name='French', value='french'),
+    discord.OptionChoice(name='Vietnamese', value='vietnamese'),
+    discord.OptionChoice(name='Spanish', value='spanish'),
+]
 
 # model_id = "openai/gpt-3.5-turbo-0125"
 model_id = "nousresearch/nous-hermes-2-mixtral-8x7b-dpo"
@@ -34,7 +66,7 @@ intents = discord.Intents.default()
 intents.messages = True
 # https://www.reddit.com/r/learnpython/comments/xicdp9/discord_bot_messagecontent_not_working/ 
 intents.message_content = True
-bot = discord.Bot(intents=intents)
+bot = discord.Bot(intents=intents,auto_sync_commands=True)
 # bot = commands.Bot(command_prefix='/', intents=intents)
 
 # queue_en = deque(maxlen=10)
@@ -111,8 +143,12 @@ async def on_message(message):
     # await bot.process_commands(message)
 
 
-@bot.slash_command()
-async def translate(ctx, language: str, *, text: str):
+@bot.slash_command(name='translate', description='Translate text to a specific language')
+async def translate(ctx, 
+                    language: Option(str, 'Select the target language', choices=language_choices, required=True), # type: ignore
+                    *, 
+                    text: str
+                    ):
     await ctx.defer()  # Defer the response to the command
     # deferred_message = await ctx.defer(ephemeral=True)
     # translator = Translator()
@@ -134,8 +170,22 @@ async def translate(ctx, language: str, *, text: str):
         # await ctx.send(f"Unsup  ported language: {language}")
         await ctx.followup.send(f"Unsupported language: {language}")
 
+
+@bot.event
+async def on_ready():
+    print(f'{bot.user.name} has connected to Discord!')
+    await bot.change_presence(activity=discord.Game(name="Heurist"))
+    # Sync commands with Discord
+    if bot.auto_sync_commands:
+        await bot.sync_commands()
+        print("sync command")
+# return on_ready
+
 async def run_bots():
+    # bot.on_ready = create_on_ready(bot)
+    # await on_ready(bot)
     await bot.start('MTIyNjI3NDMwMzA2NzI5NTkwNQ.Goh5z0.zUKRcucGTTuhUEA4PDgqeGUeluF7m5GzrqZt2Q')
+
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(run_bots())
