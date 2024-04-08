@@ -12,27 +12,28 @@ OPENROUTER_API_KEY = "sk-or-v1-a040cfe87f787b7c2f31099e870ed23268ecdc7ea25b4040d
 
 client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
 
-# language_channels = {
-#     'korean': 1224412891340607712,  # Replace with the actual channel ID for Korean
-#     'chinese': 1224412666450153482,  # Replace with the actual channel ID for Chinese
-#     'hindi': 1224412612025126965,
-#     'japanese': 1224412835392651334,
-#     'french': 1224412994549714975,
-#     'vietnamese': 1224414528863735940,
-#     'spanish': 1224505863784632340,
-
-# }
 
 language_channels = {
-    'korean': 1226343034514440353,  # Replace with the actual channel ID for Korean
-    'chinese': 1226343034514440353,  # Replace with the actual channel ID for Chinese
-    'hindi': 1226343034514440353,
-    'japanese': 1226343034514440353,
-    'french': 1226343034514440353,
-    'vietnamese': 1226343034514440353,
-    'spanish': 1226343034514440353,
+    'korean': 1224412666450153482,  
+    'chinese': 1224412891340607712,  
+    'hindi': 1224412612025126965,
+    'japanese': 1224412835392651334,
+    'french': 1224412994549714975,
+    'vietnamese': 1224414528863735940,
+    'spanish': 1224505863784632340,
 
 }
+
+# language_channels = {
+#     'korean': 1226343034514440353,  # Replace with the actual channel ID for Korean
+#     'chinese': 1226343034514440353,  # Replace with the actual channel ID for Chinese
+#     'hindi': 1226343034514440353,
+#     'japanese': 1226343034514440353,
+#     'french': 1226343034514440353,
+#     'vietnamese': 1226343034514440353,
+#     'spanish': 1226343034514440353,
+
+# }
 
 
 monitored_channels = [
@@ -126,6 +127,7 @@ def process_llm_response(content):
     
     return content
 
+# listen language channels msg and rout to Babel channel
 @bot.event
 async def on_message(message):
     if message.channel.id in monitored_channels and not message.author.bot:
@@ -135,15 +137,16 @@ async def on_message(message):
         print(f"Translated to English: {translated_text}")
 
         # Send the translated message to the designated channel
+        channel_name = message.channel.id
         target_channel_id = 1226275844809560175  # Replace with the ID of the channel to send translated messages
         target_channel = bot.get_channel(target_channel_id)
         sender = message.author
-        await target_channel.send(f"{sender.name}: {translated_text}")
+        await target_channel.send(f"{sender.name} posted in {message.channel.name} channel: {translated_text}")
 
     # await bot.process_commands(message)
 
 
-@bot.slash_command(name='translate', description='Translate text to a specific language')
+@bot.slash_command(name='translate', description='Translate text to a specific language and teleport to its language channel')
 async def translate(ctx, 
                     language: Option(str, 'Select the target language', choices=language_choices, required=True), # type: ignore
                     *, 
