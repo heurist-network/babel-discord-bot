@@ -1,2 +1,4 @@
-py-cord
-openai
+py-cord==2.5.0
+openai==1.16.2
+toml==0.10.2
+python-dotenv==1.0.1
