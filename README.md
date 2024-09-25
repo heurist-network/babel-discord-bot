@@ -1,5 +1,7 @@
 # Babel Bot for Discord translation and moderation
 
+![babel](https://github.com/user-attachments/assets/534d9434-b818-466b-adde-5fa5e93e970a)
+
 Babel Bot provides seamless two-way language translation for your Discord server. It enables automatic translation of messages from international channels to an English channel, ensuring that all users can understand the conversations. Additionally, users can use a command to translate English messages and send them to international channels, facilitating communication across language barriers.
 
 ## Features
